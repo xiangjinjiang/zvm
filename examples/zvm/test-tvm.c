@@ -272,7 +272,8 @@ void test_register() {
     tvm_start();
     tvm_set_gas(10000000);
 
-    const char *str = "class Token():\n"
+    const char *str = "register = Register()\n"
+                      "class Token():\n"
                       "\n"
                       "    def __init__(self):\n"
                       "        print('init')\n"
