@@ -306,6 +306,7 @@ void test_register() {
     tvm_execute_result_t result;
     tvm_init_result(&result);
     tvm_execute(str, "test_register", PARSE_KIND_FILE, &result);
+
     tvm_print_result(&result);
     tvm_deinit_result(&result);
 
