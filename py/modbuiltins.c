@@ -864,7 +864,14 @@ STATIC mp_obj_t decorator_call(mp_obj_t self_in, size_t n_args, size_t n_kw, con
     o->base.type = &mp_type_fun_wrap;
     mp_obj_decorator_fun_t *self = MP_OBJ_TO_PTR(self_in);
     o->fun = args[0];
-    self->func = qstr_str(mp_obj_fun_get_name(args[0]));
+    mp_obj_list_t* params = mp_obj_new_list(0, NULL);
+    int params_num = get_type_num(self->params_data);
+    for(int i=0; i<params_num; i++) {
+        const char* t = get_type_msg(self->params_data, i);
+        mp_obj_list_append(params, mp_obj_new_str(t, strlen(t)));
+    }
+    const char* func_name = qstr_str(mp_obj_fun_get_name(args[0]));
+    mp_obj_dict_store(self->public_funcs, mp_obj_new_str(func_name, strlen(func_name)), params);
     return o;
 }
 
@@ -879,7 +886,9 @@ STATIC const mp_obj_type_t mp_type_fun_decorator = {
 STATIC mp_obj_t mp_builtin_register_make_new(const mp_obj_type_t *type, size_t n_args, size_t n_kw, const mp_obj_t *args) {
     mp_obj_register_t *o = m_new_obj(mp_obj_register_t);
     o->base.type = type;
-    o->public_funcs = mp_obj_new_list(0, NULL);
+    o->public_funcs = mp_obj_new_dict(0);
+
+    //mp_store_attr(o, qstr_from_str("data"), o->public_funcs);
     return MP_OBJ_FROM_PTR(o);
 }
 
@@ -903,8 +912,7 @@ STATIC mp_obj_t builtin_register_public(size_t n_args, const mp_obj_t *args) {
     o->base.type = &mp_type_fun_decorator;
     o->params_data = params_msg;
     mp_obj_register_t *reg = MP_OBJ_TO_PTR(args[0]);
-    o->func = NULL;
-    mp_obj_list_append(reg->public_funcs, o);
+    o->public_funcs = reg->public_funcs;
     return MP_OBJ_FROM_PTR(o);
 }
 
@@ -912,7 +920,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR(builtin_register_public_obj, 0, builtin_regis
 
 STATIC const mp_rom_map_elem_t builtin_register_locals_dict_table[] = {
         { MP_ROM_QSTR(MP_QSTR_public), MP_ROM_PTR(&builtin_register_public_obj) },
-//        { MP_ROM_QSTR(MP_QSTR_decrypt), MP_ROM_PTR(&ucryptolib_aes_decrypt_obj) },
+//        { MP_ROM_QSTR(MP_QSTR_data), MP_ROM_PTR(mp_const_none) },
 };
 STATIC MP_DEFINE_CONST_DICT(builtin_register_locals_dict, builtin_register_locals_dict_table);
 
