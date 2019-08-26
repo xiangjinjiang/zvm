@@ -35,14 +35,19 @@ STATIC mp_obj_t mod_account_get_balance(mp_obj_t address) {
     if(!CheckGas(&code)) {
         return mp_const_none;
     }
-    const char* str = get_balance(mp_obj_str_get_str(address));
+    char* str = get_balance(mp_obj_str_get_str(address));
+    char* t_str = str;
+    //TODO: not neg
     bool neg = false;
     if (str[0] == 45) {
         neg = true;
-        str ++;
+        t_str ++;
     }
-    int len = strlen(str);
-    return mp_obj_new_int_from_str_len(&str, len, neg, 10);
+    int len = strlen(t_str);
+    const char* const_t_str = t_str;
+    mp_obj_t o = mp_obj_new_int_from_str_len(&const_t_str, len, neg, 10);
+    free(str);
+    return o;
 };
 
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_account_get_balance_obj , mod_account_get_balance);

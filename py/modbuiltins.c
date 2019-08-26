@@ -992,6 +992,7 @@ STATIC mp_obj_t mp_builtin_contract_fun_call(mp_obj_t self_in, size_t n_args, si
     tvm_execute_result_t result;
     tvm_init_result(&result);
     contract_call_fn(self->address, self->fun_name, params_json, &result);
+    vstr_clear(&vstr);
     mp_obj_t return_obj =  result_to_obj(&result);
     tvm_deinit_result(&result);
     return return_obj;
@@ -1091,6 +1092,7 @@ STATIC mp_obj_t builtin_event_emit(size_t n_args, const mp_obj_t *args, mp_map_t
         return mp_const_none;
     }
     event_call_fn(self->topic, params_json);
+    vstr_clear(&vstr);
     return mp_const_none;
 }
 

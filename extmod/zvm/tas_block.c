@@ -34,9 +34,11 @@ STATIC mp_obj_t mod_block_blockhash(mp_obj_t height) {
     if(!CheckGas(&code)) {
         return mp_const_none;
     }
-    const char* str = (char*)block_hash_fn(mp_obj_get_int(height));
+    char* str = block_hash_fn(mp_obj_get_int(height));
     int len = strlen(str);
-    return mp_obj_new_str(str, len);
+    free(str);
+    mp_obj_t o = mp_obj_new_str(str, len);
+    return o;
 };
 
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(mod_block_blockhash_obj , mod_block_blockhash);

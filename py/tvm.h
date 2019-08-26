@@ -23,7 +23,6 @@ extern "C" {
 #endif
 
 typedef enum {
-    //TODO none
     RETURN_TYPE_INT = 1,
     RETURN_TYPE_STRING,
     RETURN_TYPE_NONE,
