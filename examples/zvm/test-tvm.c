@@ -550,6 +550,52 @@ void test_2() {
     }
 }
 
+void test_export_abi() {
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "class Token():\n"
+            "\n"
+            "    def __init__(self):\n"
+            "        print(self)\n"
+            "        print('init')\n"
+            "\n"
+            "    @register.public()\n"
+            "    def deploy(self):\n"
+            "        print(self)\n"
+            "        print('deploy')\n"
+            "\n"
+            "    def foo(self):\n"
+            "        print(xxxx)\n"
+            "\n"
+            "    @register.public(str, str)\n"
+            "    def deploy2(self, a, b):\n"
+            "        print('deploy2')\n"
+            "        print(a)\n"
+            "        print(b)\n"
+            "        self.foo()\n"
+            "\n"
+            "    def deploy3(self):\n"
+            "        make_error\n"
+            ""
+            "\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_tvm_abli_call", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+    
+    
+    char *abi;
+    tvm_export_abi(&abi);
+    printf("%s\n", abi);
+}
+
 int main() {
 //    test_execute();
 
@@ -572,7 +618,7 @@ int main() {
 
 //    test_zdict();
 
-    test_tvm_abli_call();
+//    test_tvm_abli_call();
 
 //    test_msg();
 
@@ -580,6 +626,7 @@ int main() {
 
 //    test_2();
 
+    test_export_abi();
 
     printf("finished\n");
 }

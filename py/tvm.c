@@ -71,8 +71,6 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
     vstr_clear(&vstr);
 }
 
-//static char heap[16384];
-long heap_size = 1024 * 1024 * (sizeof(mp_uint_t) / 4);
 void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm_execute_result_t *result) {
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
@@ -461,6 +459,6 @@ void tvm_export_abi(char ** params_json) {
     mp_obj_print_helper(&print, abi, PRINT_JSON);
     *params_json = malloc(vstr.len);
     memcpy(*params_json, vstr.buf, vstr.len);
-    vstr_free(&vstr);
+    vstr_clear(&vstr);
 }
 
