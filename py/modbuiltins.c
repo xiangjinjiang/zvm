@@ -920,7 +920,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_VAR(builtin_register_public_obj, 0, builtin_regis
 
 STATIC const mp_rom_map_elem_t builtin_register_locals_dict_table[] = {
         { MP_ROM_QSTR(MP_QSTR_public), MP_ROM_PTR(&builtin_register_public_obj) },
-        { MP_ROM_QSTR(MP_QSTR_data), MP_ROM_PTR(mp_const_none) },
+//        { MP_ROM_QSTR(MP_QSTR_data), MP_ROM_PTR(mp_const_none) },
 };
 STATIC MP_DEFINE_CONST_DICT(builtin_register_locals_dict, builtin_register_locals_dict_table);
 
