@@ -272,7 +272,8 @@ void test_register() {
     tvm_start();
     tvm_set_gas(10000000);
 
-    const char *str = "class Token():\n"
+    const char *str = "register = Register()\n"
+                      "class Token():\n"
                       "\n"
                       "    def __init__(self):\n"
                       "        print('init')\n"
@@ -305,6 +306,7 @@ void test_register() {
     tvm_execute_result_t result;
     tvm_init_result(&result);
     tvm_execute(str, "test_register", PARSE_KIND_FILE, &result);
+
     tvm_print_result(&result);
     tvm_deinit_result(&result);
 
@@ -549,7 +551,6 @@ void test_2() {
     }
 }
 
-
 char* _get_balance (const char* addr) {
     char *str = malloc(100);
     memset(str, 0, 100);
@@ -560,22 +561,19 @@ char* _get_balance (const char* addr) {
 void test_get_banalce() {
     get_balance = _get_balance;
 
-    tvm_start();
-    tvm_set_gas(10000000);
-
     const char *str =
             "import account\n"
             "class Token():\n"
             "\n"
             "    def __init__(self):\n"
-            "        print(account.get_balance('zvxxx'))\n"
-            "\n";
+            "        print(account.get_balance('zvxxx'))\n";
 
     tvm_set_register();
     tvm_set_msg("zvxxx", 500);
 
     tvm_execute_result_t result;
     tvm_init_result(&result);
+
     tvm_execute(str, "test_get_banalce", PARSE_KIND_FILE, &result);
     tvm_print_result(&result);
     tvm_deinit_result(&result);
@@ -584,6 +582,58 @@ void test_get_banalce() {
     tvm_fun_call("Token", "__init__", NULL, &result);
     tvm_print_result(&result);
     tvm_deinit_result(&result);
+}
+
+void test_export_abi() {
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "class Token():\n"
+            "\n"
+            "    def __init__(self):\n"
+            "        print(self)\n"
+            "        print('init')\n"
+            "\n"
+            "    @register.public()\n"
+            "    def deploy(self):\n"
+            "        print(self)\n"
+            "        print('deploy')\n"
+            "\n"
+            "    def foo(self):\n"
+            "        print(xxxx)\n"
+            "\n"
+            "    @register.public(str, str)\n"
+            "    def deploy2(self, a, b):\n"
+            "        print('deploy2')\n"
+            "        print(a)\n"
+            "        print(b)\n"
+            "        self.foo()\n"
+            "\n"
+            "    def deploy3(self):\n"
+            "        make_error\n"
+            ""
+            "\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+
+    tvm_execute(str, "test_tvm_abli_call", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Token", "__init__", NULL, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    char *abi;
+    tvm_export_abi(&abi);
+    printf("%s\n", abi);
+    free(abi);
 }
 
 int main() {
@@ -618,7 +668,10 @@ int main() {
 
 //    test_export_abi();
 
-    test_get_banalce();
+//    test_get_banalce();
+
+    test_export_abi();
+
 
     printf("finished\n");
 }

@@ -71,8 +71,6 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
     vstr_clear(&vstr);
 }
 
-//static char heap[16384];
-long heap_size = 1024 * 1024 * (sizeof(mp_uint_t) / 4);
 void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm_execute_result_t *result) {
     nlr_buf_t nlr;
     if (nlr_push(&nlr) == 0) {
@@ -257,26 +255,17 @@ void tvm_fun_call(const char *class_name, const char *func_name, const char *jso
     nlr_buf_t nlr;
     mp_obj_t data = NULL;
     if (nlr_push(&nlr) == 0) {
-        unsigned int params_data = 0;
         mp_obj_register_t *reg = mp_load_name(qstr_from_str("register"));
-        size_t public_funcs_num;
-        mp_obj_t *public_funcs;
-        mp_obj_list_get(reg->public_funcs, &public_funcs_num, &public_funcs);
         bool is_deploy = (strcmp(func_name, "__init__") == 0);
         size_t n_args;
         mp_obj_t *items;
         if (!is_deploy) {
             // find function info
-            for(int i=0; i<public_funcs_num; i++) {
-                mp_obj_decorator_fun_t* func = MP_OBJ_TO_PTR(public_funcs[i]);
-                if (func->func != NULL && strcmp(func->func, func_name) == 0) {
-                    params_data = func->params_data;
-                    break;
-                } else if (i == public_funcs_num-1) {
-                    char error[80];
-                    sprintf(error, "%s is not a public function", func_name);
-                    mp_raise_ABICheckException(error);
-                }
+            mp_map_elem_t *item = mp_map_lookup(&reg->public_funcs->map, mp_obj_new_str(func_name, strlen(func_name)), MP_MAP_LOOKUP);
+            if (item == NULL) {
+                char error[80];
+                sprintf(error, "%s is not a public function", func_name);
+                mp_raise_ABICheckException(error);
             }
 
             if (json_args != NULL) {
@@ -291,16 +280,18 @@ void tvm_fun_call(const char *class_name, const char *func_name, const char *jso
             } else {
                 n_args = 0;
             }
-
+            size_t params_num = 0;
+            mp_obj_t *param_types;
+            mp_obj_list_get(item->value, &params_num, &param_types);
             // check params num
-            if (get_type_num(params_data) != n_args) {
+            if (params_num != n_args) {
                 char error[80];
                 sprintf(error, "function: %s's params num error", func_name);
                 mp_raise_ABICheckException(error);
             }
             // check params type
             for (int i=0; i<(int)n_args; i++) {
-                const char* wanted_type = get_type_msg(params_data, i);
+                const char* wanted_type = mp_obj_str_get_str(param_types[i]);
                 if (strcmp(wanted_type, mp_obj_get_type_str(items[i])) != 0) {
                     char error[80];
                     sprintf(error, "function: %s's params type error", func_name);
@@ -449,26 +440,16 @@ int get_type_num(unsigned int msg) {
     return MAX_PARAMS_NUM;
 }
 
-const char* tvm_export_abi() {
-    unsigned int params_data = 0;
+void tvm_export_abi(char ** params_json) {
     mp_obj_register_t *reg = mp_load_name(qstr_from_str("register"));
-    size_t public_funcs_num;
-    mp_obj_t *public_funcs;
-    mp_obj_list_get(reg->public_funcs, &public_funcs_num, &public_funcs);
+    mp_map_t *mp = mp_obj_dict_get_map(reg->public_funcs);
+    size_t max = mp->alloc;
     mp_obj_list_t *abi = mp_obj_new_list(0, NULL);
-    for(int i=0; i<public_funcs_num; i++) {
-        mp_obj_decorator_fun_t* func = MP_OBJ_TO_PTR(public_funcs[i]);
-        if (func->func != NULL) {
-            params_data = func->params_data;
+    for (size_t i = 0; i < max; i++) {
+        if (mp_map_slot_is_filled(mp, i)) {
             mp_obj_dict_t* items = mp_obj_new_dict(2);
-            mp_obj_dict_store(items, mp_obj_new_str("func_name", 9), mp_obj_new_str(func->func, strlen(func->func)));
-            mp_obj_list_t *params = mp_obj_new_list(0, NULL);
-            int params_num = get_type_num(params_data);
-            for(int j=0;j<params_num;j++) {
-                const char* t = get_type_msg(params_data, j);
-                mp_obj_list_append(params, mp_obj_new_str(t, strlen(t)));
-            }
-            mp_obj_dict_store(items, mp_obj_new_str("args", 4),params);
+            mp_obj_dict_store(items, mp_obj_new_str("func_name", 9), mp->table[i].key);
+            mp_obj_dict_store(items, mp_obj_new_str("args", 4),mp->table[i].value);
             mp_obj_list_append(abi, items);
         }
     }
@@ -476,7 +457,8 @@ const char* tvm_export_abi() {
     mp_print_t print;
     vstr_init_print(&vstr, 8, &print);
     mp_obj_print_helper(&print, abi, PRINT_JSON);
-    const char *params_json = vstr_str(&vstr);
-    return params_json;
+    *params_json = malloc(vstr.len);
+    memcpy(*params_json, vstr.buf, vstr.len);
+    vstr_clear(&vstr);
 }
 

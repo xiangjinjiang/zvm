@@ -73,7 +73,7 @@ int is_supported_type(const char* t);
 const char* get_type_msg(unsigned int msg, int num);
 void set_type_msg(unsigned int *msg, int num, int type_index);
 int get_type_num(unsigned int msg);
-const char* tvm_export_abi();
+void tvm_export_abi(char ** params_json);
 
 // account
 typedef char* (*get_balance_fn_t) (const char*);
