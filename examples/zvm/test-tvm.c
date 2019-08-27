@@ -636,6 +636,34 @@ void test_export_abi() {
     free(abi);
 }
 
+void test_qstr() {
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "class Token():\n"
+            "\n"
+            "    def __init__(self):\n"
+            "        self.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = 100\n"
+            "\n"
+            "\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+
+    tvm_execute(str, "test_qstr", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Token", "__init__", NULL, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 int main() {
 //    test_execute();
 
@@ -670,8 +698,9 @@ int main() {
 
 //    test_get_banalce();
 
-    test_export_abi();
+//    test_export_abi();
 
+    test_qstr();
 
     printf("finished\n");
 }
