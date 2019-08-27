@@ -43,7 +43,6 @@ typedef struct _tvm_execute_result_t {
     int result_type; //tvm_return_type_t
     int error_code;
     char *content;
-    char *abi;
 }tvm_execute_result_t;
 void tvm_print_result(tvm_execute_result_t *result);
 void tvm_init_result(tvm_execute_result_t *result);
@@ -55,6 +54,7 @@ void tvm_fun_call(const char *class_name, const char *func_name, const char *arg
 
 void tvm_set_register();
 void tvm_set_msg(const char* sender, unsigned long long value);
+void tvm_set_this(const char* this);
 
 void tvm_set_lib_path(const char* path);
 

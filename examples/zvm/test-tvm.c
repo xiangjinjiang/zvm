@@ -584,6 +584,51 @@ void test_get_banalce() {
     tvm_deinit_result(&result);
 }
 
+char* event_call (const char* a, const char* b) {
+    printf("name: %s, value: %s\n", a, b);
+    return NULL;
+}
+
+char* block_hash (unsigned long long index) {
+    char *str = malloc(100);
+    memset(str, 0, 100);
+    memcpy(str, "0x72d0dee3e9c2f6d360a36d9ff9e4a01d9d7123f72fb88d1fbef1c765fd19866e", strlen("0x72d0dee3e9c2f6d360a36d9ff9e4a01d9d7123f72fb88d1fbef1c765fd19866e"));
+    return str;
+}
+
+void test_event() {
+    block_hash_fn = block_hash;
+    event_call_fn = event_call;
+
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "import block\n"
+            "event=Event('a')\n"
+            "class Token():\n"
+            "\n"
+            "    def __init__(self):\n"
+            "        print(block.blockhash(1))\n"
+            "        event.emit(block.blockhash(1))\n"
+            "\n"
+            "\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_event", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Token", "__init__", NULL, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 void test_export_abi() {
     tvm_start();
     tvm_set_gas(10000000);
@@ -694,11 +739,13 @@ int main() {
 
 //    test_2();
 
-//    test_export_abi();
+for (int i = 0; i < 50; i++ ) {
+    test_event();
+}
 
-//    test_get_banalce();
+    //test_get_banalce();
 
-//    test_export_abi();
+    //test_export_abi();
 
     test_qstr();
 
