@@ -12,7 +12,7 @@ extern const mp_obj_type_t mp_builtin_zdict_type;
 //zdict
 typedef struct _mp_obj_zdict_t {
     mp_obj_base_t base;
-    const char* storage_key;
+    char* storage_key;
     size_t storage_key_len;
 } mp_obj_zdict_t;
 

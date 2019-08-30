@@ -657,7 +657,8 @@ mp_obj_t mp_obj_new_storage_value(mp_obj_t self_in, const char* storage_key, siz
         mp_obj_t class = mp_load_name(qstr_from_str("zdict"));
         mp_obj_t object = mp_call_function_0(class);
         mp_obj_zdict_t *o = MP_OBJ_TO_PTR(object);
-        o->storage_key = storage_key;
+        o->storage_key = malloc(storage_key_len);
+        memcpy(o->storage_key, storage_key, storage_key_len);
         o->storage_key_len = storage_key_len;
         r = object;
     } else if (data[0] == BYTE_FORMAT_C) {
