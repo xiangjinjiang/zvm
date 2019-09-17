@@ -35,9 +35,12 @@ STATIC mp_obj_t mod_block_blockhash(mp_obj_t height) {
         return mp_const_none;
     }
     char* str = block_hash_fn(mp_obj_get_int(height));
+    if (str == NULL) {
+        return mp_const_none;
+    }
     int len = strlen(str);
-    free(str);
     mp_obj_t o = mp_obj_new_str(str, len);
+    free(str);
     return o;
 };
 

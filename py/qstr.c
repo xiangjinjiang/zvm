@@ -192,7 +192,11 @@ qstr qstr_from_str(const char *str) {
 }
 
 qstr qstr_from_strn(const char *str, size_t len) {
-    assert(len < (1 << (8 * MICROPY_QSTR_BYTES_IN_LEN)));
+//    assert(len < (1 << (8 * MICROPY_QSTR_BYTES_IN_LEN)));
+    if (len >= (1 << (8 * MICROPY_QSTR_BYTES_IN_LEN))) {
+        nlr_raise(mp_obj_new_exception_msg(&mp_type_AssertionError,
+                                           "qstr: len < (1 << (8 * MICROPY_QSTR_BYTES_IN_LEN"));
+    }
     QSTR_ENTER();
     qstr q = qstr_find_strn(str, len);
     if (q == 0) {

@@ -59,7 +59,7 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
     if (strcmp(exception_name, "GasNotEnoughException") == 0) {
         error_code = 1002;
     }else if (strcmp(exception_name, "ABICheckException") == 0) {
-        error_code = 2002;
+        error_code = 1003;
     }
 
     vstr_t vstr;
@@ -121,15 +121,12 @@ void tvm_print_result(tvm_execute_result_t *result) {
     printf("error_code: %d\n", result->error_code);
     if (result->content)
         printf("content: %s\n", result->content);
-    if (result->abi)
-        printf("abi: %s\n", result->abi);
 }
 
 void tvm_init_result(tvm_execute_result_t *result) {
     result->result_type = -1;
     result->error_code = -1;
     result->content = NULL;
-    result->abi = NULL;
 }
 
 void tvm_deinit_result(tvm_execute_result_t *result) {
@@ -138,10 +135,6 @@ void tvm_deinit_result(tvm_execute_result_t *result) {
     if (result->content) {
         free(result->content);
         result->content = NULL;
-    }
-    if (result->abi) {
-        free(result->abi);
-        result->abi = NULL;
     }
 }
 
@@ -350,6 +343,10 @@ void tvm_set_msg(const char* sender, unsigned long long value) {
     mp_obj_t msg_object = mp_call_function_2(msg_class, mp_obj_new_str(sender, strlen(sender)), mp_obj_new_int_from_ull(value));
 
     mp_store_global(qstr_from_str("msg"), msg_object);
+}
+
+void tvm_set_this(const char* sender) {
+    mp_store_global(qstr_from_str("this"), mp_obj_new_str(sender, strlen(sender)));
 }
 
 /***********************/

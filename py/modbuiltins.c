@@ -642,7 +642,20 @@ mp_obj_t mp_obj_new_storage_value(mp_obj_t self_in, const char* storage_key, siz
     if (data[0] == SMALLINT_FORMAT_C) {
         r = mp_obj_new_int(*(mp_int_t*)(data+1));
     } else if (data[0] == INT_FORMAT_C) {
-        r = mp_obj_int_from_bytes_impl(MP_ENDIANNESS_LITTLE, data_len-1, (byte*)(data+1));
+        if ((data[1] & 0x80) != 0) {
+            for (int i = 1; i < data_len; i++) {
+                data[i] = ~(data[i]);
+            }
+            mp_obj_int_t *bigint = MP_OBJ_TO_PTR(mp_obj_int_from_bytes_impl(MP_ENDIANNESS_LITTLE, data_len-1, (byte*)(data+1)));
+            mpz_t mpzone;
+            mpz_init_from_int(&mpzone, 1);
+            mpz_add_inpl(&bigint->mpz, &bigint->mpz, &mpzone);
+            bigint->mpz.neg = 1;
+            r = bigint;
+        } else {
+            mp_obj_int_t *bigint = MP_OBJ_TO_PTR(mp_obj_int_from_bytes_impl(MP_ENDIANNESS_LITTLE, data_len-1, (byte*)(data+1)));
+            r = bigint;
+        }
     } else if (data[0] == STR_FORMAT_C) {
         r = mp_obj_new_str(data+1, data_len-1);
     } else if (data[0] == NONE_FORMAT_C) {
@@ -657,7 +670,8 @@ mp_obj_t mp_obj_new_storage_value(mp_obj_t self_in, const char* storage_key, siz
         mp_obj_t class = mp_load_name(qstr_from_str("zdict"));
         mp_obj_t object = mp_call_function_0(class);
         mp_obj_zdict_t *o = MP_OBJ_TO_PTR(object);
-        o->storage_key = storage_key;
+        o->storage_key = malloc(storage_key_len);
+        memcpy(o->storage_key, storage_key, storage_key_len);
         o->storage_key_len = storage_key_len;
         r = object;
     } else if (data[0] == BYTE_FORMAT_C) {
