@@ -565,8 +565,15 @@ mp_obj_t result_to_obj(const tvm_execute_result_t *result) {
 	switch (result->result_type)
 	{
 	    case RETURN_TYPE_INT: {
-            const char *str = result->content;
-            return mp_obj_new_int_from_str_len(&str, strlen(result->content), false, 10);
+	        mp_obj_t r;
+	        if (result->content[0] == '-') {
+	            const char *str = result->content+1;
+                r = mp_obj_new_int_from_str_len(&str, strlen(str), true, 10);
+	        } else {
+	        	const char *str = result->content;
+                r = mp_obj_new_int_from_str_len(&str, strlen(str), false, 10);
+	        }
+            return r;
 	    }
 	    case RETURN_TYPE_STRING:
             return mp_obj_new_str(result->content, strlen(result->content));
