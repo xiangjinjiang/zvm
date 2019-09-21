@@ -285,7 +285,12 @@ mp_obj_t mp_obj_int_binary_op(mp_binary_op_t op, mp_obj_t lhs_in, mp_obj_t rhs_i
                 break;
 
             default: {
+                #if ZVM_EXTMOD
+                mp_raise_TypeError("unsupported types for decimal");
+                #else
                 assert(op == MP_BINARY_OP_DIVMOD);
+                #endif
+
                 if (mpz_is_zero(zrhs)) {
                     goto zero_division_error;
                 }

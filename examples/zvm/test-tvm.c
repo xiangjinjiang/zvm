@@ -709,6 +709,22 @@ void test_qstr() {
     tvm_deinit_result(&result);
 }
 
+void test_div() {
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "# a = 5 / 3\n"
+            "a = 2 / 50000000000000000000000000000\n"
+            "\n";
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_qstr", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 int main() {
 //    test_execute();
 
@@ -739,15 +755,17 @@ int main() {
 
 //    test_2();
 
-for (int i = 0; i < 50; i++ ) {
-    test_event();
-}
+//for (int i = 0; i < 50; i++ ) {
+//    test_event();
+//}
 
     //test_get_banalce();
 
     //test_export_abi();
 
-    test_qstr();
+//    test_qstr();
+
+    test_div();
 
     printf("finished\n");
 }
