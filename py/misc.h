@@ -98,7 +98,9 @@ void *m_realloc_maybe(void *ptr, size_t new_num_bytes, bool allow_move);
 void m_free(void *ptr);
 #endif
 NORETURN void m_malloc_fail(size_t num_bytes);
-
+#if ZVM_EXTMOD
+NORETURN void mp_raise_GasNotEnoughError(const char *msg);
+#endif
 #if MICROPY_MEM_STATS
 size_t m_get_total_bytes_allocated(void);
 size_t m_get_current_bytes_allocated(void);

@@ -30,6 +30,8 @@ bool FireGas_DB(size_t len);
 
 bool CheckGas(byte* op);
 
+bool FireGas_Mul(size_t len);
+
 void Gas_Report();
 
 #endif //GAS_H

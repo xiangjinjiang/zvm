@@ -98,7 +98,9 @@ void *m_malloc(size_t num_bytes) {
 #endif
     DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
 #if ZVM_EXTMOD
-    FireGas_Mem(num_bytes);
+    if (!FireGas_Mem(num_bytes)) {
+        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+    }
 #endif
     return ptr;
 }
@@ -168,7 +170,9 @@ void *m_realloc(void *ptr, size_t new_num_bytes) {
     DEBUG_printf("realloc %p, %d : %p\n", ptr, new_num_bytes, new_ptr);
     #endif
 #if ZVM_EXTMOD
-    FireGas_Mem(new_num_bytes);
+    if (!FireGas_Mem(new_num_bytes)) {
+        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+    }
 #endif
     return new_ptr;
 }

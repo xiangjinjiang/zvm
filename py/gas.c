@@ -151,7 +151,7 @@ STCODEGAS g_CodeGas[] = {
 
 };
 
-long long g_iGas = 100000;
+long long g_iGas = 100000000;
 
 #define GAS_PRECISION 10000
 
@@ -247,6 +247,19 @@ bool FireGas_DB(size_t len)
     const int MAX = INT_MAX / 3814;
     if (len < MAX) {
         len = len * 3814;//(int)(0.3814697265625 * GAS_PRECISION);
+        db_gas += len;
+        return FireGas(len);
+    } else {
+        g_iGas = 0;
+        return false;
+    }
+}
+
+bool FireGas_Mul(size_t len)
+{
+    const int MAX = INT_MAX / (Ext * GAS_PRECISION);
+    if (len < MAX) {
+        len = len * High * GAS_PRECISION;
         db_gas += len;
         return FireGas(len);
     } else {
