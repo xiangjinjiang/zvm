@@ -731,6 +731,72 @@ void test_bigint() {
     tvm_deinit_result(&result);
 }
 
+void test_exectime() {
+    tvm_set_gas(100000000);
+    tvm_start();
+    tvm_set_gas(500000);
+
+    const char *str =
+            "'asdfffffffff2349823480293842309489023849023849032' * 873981273981273\n"
+            "max = 10000000000\n"
+            "counter = 0\n"
+            "while counter < max:\n"
+            "    counter += 1\n"
+            "\n";
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_exectime", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
+void test_crash() {
+    tvm_set_gas(100000000);
+    tvm_start();
+    tvm_set_gas(500000);
+
+    const char *str =
+            "a = range(1000000000000000000)\n"
+            "print(list(a))\n"
+            "\n";
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_crash", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
+void test_import() {
+    tvm_set_gas(100000000);
+    tvm_start();
+    tvm_set_gas(500000);
+
+    const char *str =
+//            "import sys\n"
+//            "print(dir(sys))\n"
+//            "print(sys.path)\n"
+
+//            "import micropython\n"
+//            "print(dir(micropython))\n"
+
+            "import gc\n"
+            "print(dir(gc))\n"
+
+            "import uio\n"
+            "print(dir(uio))\n"
+//            "f = uio.open('/Users/guangyujing/workspace/global_node_deploy/b.py')\n"
+//            "print(f.readlines())\n"
+            "\n";
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_import", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 int main() {
 //    test_execute();
 
@@ -771,7 +837,13 @@ int main() {
 
 //    test_qstr();
 
-    test_bigint();
+//    test_bigint();
+
+//    test_exectime();
+
+//    test_crash();
+
+    test_import();
 
     printf("finished\n");
 }
