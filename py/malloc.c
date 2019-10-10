@@ -87,6 +87,12 @@ STATIC void *realloc_ext(void *ptr, size_t n_bytes, bool allow_move) {
 #endif // MICROPY_ENABLE_GC
 
 void *m_malloc(size_t num_bytes) {
+#if ZVM_EXTMOD
+    if (!FireGas_Mem(num_bytes)) {
+        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+    }
+#endif
+
     void *ptr = malloc(num_bytes);
     if (ptr == NULL && num_bytes != 0) {
         m_malloc_fail(num_bytes);
@@ -97,15 +103,17 @@ void *m_malloc(size_t num_bytes) {
     UPDATE_PEAK();
 #endif
     DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
-#if ZVM_EXTMOD
-    if (!FireGas_Mem(num_bytes)) {
-        mp_raise_GasNotEnoughError("does not have enough gas to run!");
-    }
-#endif
+
     return ptr;
 }
 
 void *m_malloc_maybe(size_t num_bytes) {
+#if ZVM_EXTMOD
+    if (!FireGas_Mem(num_bytes)) {
+//        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+        return NULL;
+    }
+#endif
     void *ptr = malloc(num_bytes);
 #if MICROPY_MEM_STATS
     MP_STATE_MEM(total_bytes_allocated) += num_bytes;
@@ -113,9 +121,7 @@ void *m_malloc_maybe(size_t num_bytes) {
     UPDATE_PEAK();
 #endif
     DEBUG_printf("malloc %d : %p\n", num_bytes, ptr);
-#if ZVM_EXTMOD
-    FireGas_Mem(num_bytes);
-#endif
+
     return ptr;
 }
 
@@ -149,6 +155,11 @@ void *m_realloc(void *ptr, size_t old_num_bytes, size_t new_num_bytes) {
 #else
 void *m_realloc(void *ptr, size_t new_num_bytes) {
 #endif
+#if ZVM_EXTMOD
+    if (!FireGas_Mem(new_num_bytes)) {
+        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+    }
+#endif
     void *new_ptr = realloc(ptr, new_num_bytes);
     if (new_ptr == NULL && new_num_bytes != 0) {
         m_malloc_fail(new_num_bytes);
@@ -169,11 +180,7 @@ void *m_realloc(void *ptr, size_t new_num_bytes) {
     #else
     DEBUG_printf("realloc %p, %d : %p\n", ptr, new_num_bytes, new_ptr);
     #endif
-#if ZVM_EXTMOD
-    if (!FireGas_Mem(new_num_bytes)) {
-        mp_raise_GasNotEnoughError("does not have enough gas to run!");
-    }
-#endif
+
     return new_ptr;
 }
 
@@ -181,6 +188,12 @@ void *m_realloc(void *ptr, size_t new_num_bytes) {
 void *m_realloc_maybe(void *ptr, size_t old_num_bytes, size_t new_num_bytes, bool allow_move) {
 #else
 void *m_realloc_maybe(void *ptr, size_t new_num_bytes, bool allow_move) {
+#endif
+#if ZVM_EXTMOD
+    if (!FireGas_Mem(new_num_bytes)) {
+//        mp_raise_GasNotEnoughError("does not have enough gas to run!");
+        return NULL;
+    }
 #endif
     void *new_ptr = realloc_ext(ptr, new_num_bytes, allow_move);
 #if MICROPY_MEM_STATS
@@ -202,9 +215,6 @@ void *m_realloc_maybe(void *ptr, size_t new_num_bytes, bool allow_move) {
     #else
     DEBUG_printf("realloc %p, %d, %d : %p\n", ptr, new_num_bytes, new_ptr);
     #endif
-#if ZVM_EXTMOD
-    FireGas_Mem(new_num_bytes);
-#endif
     return new_ptr;
 }
 
