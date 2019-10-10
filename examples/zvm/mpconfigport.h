@@ -87,7 +87,7 @@
 #define MICROPY_PY_IO               (1)
 #define MICROPY_PY_IO_FILEIO        (0)
 #define MICROPY_PY_STRUCT           (0)
-#define MICROPY_PY_SYS              (1)
+#define MICROPY_PY_SYS              (0)
 #define MICROPY_PY_SYS_EXIT         (0)
 #define MICROPY_PY_SYS_PLATFORM     "linux"
 #define MICROPY_PY_SYS_MAXSIZE      (0)
