@@ -1,6 +1,6 @@
 ZVM is short for ZVChain Virtual Machine.
 
-ZVChain's Smart Contract language is Python, which can execute in the TVM.
+ZVChain's Smart Contract language is Python, which can execute in the ZVM.
 
 One module of ZVM is the python interpreter, which is forked from [Micropython](https://github.com/micropython/micropython).
 
