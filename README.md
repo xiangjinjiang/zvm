@@ -1,8 +1,8 @@
-TVM is short for TASChain Virtual Machine.
+ZVM is short for ZVChain Virtual Machine.
 
-TASChain's Smart Contract language is Python, which can execute in the TVM.
+ZVChain's Smart Contract language is Python, which can execute in the ZVM.
 
-One module of TVM is the python interpreter, which is forked from [Micropython](https://github.com/micropython/micropython).
+One module of ZVM is the python interpreter, which is forked from [Micropython](https://github.com/micropython/micropython).
 
 
 ## Build
