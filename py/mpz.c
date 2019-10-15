@@ -429,7 +429,7 @@ STATIC size_t mpn_mul(mpz_dig_t *idig, mpz_dig_t *jdig, size_t jlen, mpz_dig_t *
     mpz_dig_t *oidig = idig;
     size_t ilen = 0;
 
-//    if (!FireGas_Mul(klen)) {
+//    if (!FireGas_Mul(jlen*klen)) {
 //        mp_raise_GasNotEnoughError("does not have enough gas to run!");
 //    }
 
