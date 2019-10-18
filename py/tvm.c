@@ -35,6 +35,8 @@
 #include "py/objint.h"
 #include "py/bc0.h"
 
+_Bool ZIP002 = false;
+
 uint mp_import_stat(const char *path) {
     struct stat st;
     if (stat(path, &st) == 0) {
@@ -95,7 +97,7 @@ void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm
 // 0.03814697265625	per memory byte
 // 500000gas / 0.04 = 11.9mb
 static char heap[1024 * 1024 * 16];
-void tvm_start(void) {
+void tvm_start() {
 	// Initialized stack limit
 //	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
 	// Initialize heap

@@ -29,6 +29,7 @@
 
 #include "py/mpz.h"
 #include "py/gas.h"
+#include "py/tvm.h"
 
 #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_MPZ
 
@@ -429,9 +430,11 @@ STATIC size_t mpn_mul(mpz_dig_t *idig, mpz_dig_t *jdig, size_t jlen, mpz_dig_t *
     mpz_dig_t *oidig = idig;
     size_t ilen = 0;
 
-//    if (!FireGas_Mul(jlen*klen)) {
-//        mp_raise_GasNotEnoughError("does not have enough gas to run!");
-//    }
+    if (ZIP002) {
+        if (!FireGas_Mul(jlen*klen)) {
+            mp_raise_GasNotEnoughError("does not have enough gas to run!");
+        }
+    }
 
     for (; klen > 0; --klen, ++idig, ++kdig) {
         mpz_dig_t *id = idig;

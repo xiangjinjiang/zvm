@@ -257,9 +257,9 @@ bool FireGas_DB(size_t len)
 
 bool FireGas_Mul(size_t len)
 {
-    const int MAX = INT_MAX / (High * GAS_PRECISION);
+    const int MAX = INT_MAX / (1 * GAS_PRECISION);
     if (len < MAX) {
-        len = len * High * GAS_PRECISION;
+        len = len * 1 * GAS_PRECISION;
         cpu_gas += len;
         return FireGas(len);
     } else {

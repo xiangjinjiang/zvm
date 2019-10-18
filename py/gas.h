@@ -19,7 +19,7 @@
 #include "py/mpconfig.h"
 #include "py/misc.h"
 
-
+extern long long g_iGas;
 void setGas(int value);
 
 int getGas();
