@@ -64,8 +64,7 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
         error_code = 1003;
     }
 
-    int tmp_gas = getGas();
-    setGas(100000);
+    g_calculate_gas = false;
     vstr_t vstr;
     mp_print_t print;
     vstr_init_print(&vstr, 8, &print);
@@ -73,7 +72,7 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
     mp_obj_get_exception_str(&print, o);
     mp_obj_fill_exception(vstr.buf, error_code, result);
     vstr_clear(&vstr);
-    setGas(tmp_gas);
+    g_calculate_gas = true;
 }
 
 void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm_execute_result_t *result) {
@@ -99,7 +98,9 @@ void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm
 static char heap[1024 * 1024 * 16];
 void tvm_start() {
 	// Initialized stack limit
-//	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
+    mp_stack_ctrl_init();
+	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
+//    mp_stack_set_limit(8192);
 	// Initialize heap
 	gc_init(heap, heap + sizeof(heap));
 	// Initialize interpreter

@@ -19,7 +19,8 @@
 #include "py/mpconfig.h"
 #include "py/misc.h"
 
-extern long long g_iGas;
+extern bool g_calculate_gas;
+
 void setGas(int value);
 
 int getGas();

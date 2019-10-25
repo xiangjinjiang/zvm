@@ -820,7 +820,25 @@ void test_complex() {
     tvm_deinit_result(&result);
 }
 
+void test_recursive() {
+    tvm_set_gas(100000000);
+    tvm_start();
+    tvm_set_gas(500000);
+
+    const char *str =
+            "def a():\n"
+            "    a()\n"
+            "a()\n";
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_loop", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 int main() {
+
 //    test_execute();
 
 //    test_gc();
@@ -860,7 +878,7 @@ int main() {
 
 //    test_qstr();
 
-    test_bigint();
+//    test_bigint();
 
 //    test_exectime();
 
@@ -869,6 +887,8 @@ int main() {
 //    test_import();
 
 //    test_complex();
+
+    test_recursive();
 
     printf("finished\n");
 }

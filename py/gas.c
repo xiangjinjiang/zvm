@@ -152,6 +152,7 @@ STCODEGAS g_CodeGas[] = {
 };
 
 long long g_iGas = 100000000;
+_Bool g_calculate_gas = true;
 
 #define GAS_PRECISION 10000
 
@@ -205,6 +206,7 @@ GASPRICE GetGas(byte* op)
 
 bool FireGas(int gas)
 {
+//    printf("g_gas:%" PRIdLL " gas:%" PRIdLL " cpu:%" PRIdLL " mem:%" PRIdLL " db:%" PRIdLL "\n", g_iGas, (long long)gas, cpu_gas/GAS_PRECISION, mem_gas/GAS_PRECISION, db_gas/GAS_PRECISION);
     if (g_iGas - gas >= 0) {
         g_iGas -= gas;
         return true;
