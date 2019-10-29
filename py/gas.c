@@ -206,6 +206,10 @@ GASPRICE GetGas(byte* op)
 
 bool FireGas(int gas)
 {
+    if (!g_calculate_gas) {
+        return true;
+    }
+
 //    printf("g_gas:%" PRIdLL " gas:%" PRIdLL " cpu:%" PRIdLL " mem:%" PRIdLL " db:%" PRIdLL "\n", g_iGas, (long long)gas, cpu_gas/GAS_PRECISION, mem_gas/GAS_PRECISION, db_gas/GAS_PRECISION);
     if (g_iGas - gas >= 0) {
         g_iGas -= gas;
@@ -233,6 +237,10 @@ bool CheckGas(byte* op)
 
 bool FireGas_Mem(size_t len)
 {
+    if (!g_calculate_gas) {
+        return true;
+    }
+
     const int MAX = INT_MAX / 381;
     if (len < MAX) {
         len = len * 381;//(int)(0.03814697265625 * GAS_PRECISION);
@@ -246,6 +254,10 @@ bool FireGas_Mem(size_t len)
 
 bool FireGas_DB(size_t len)
 {
+    if (!g_calculate_gas) {
+        return true;
+    }
+
     const int MAX = INT_MAX / 3814;
     if (len < MAX) {
         len = len * 3814;//(int)(0.3814697265625 * GAS_PRECISION);
@@ -259,6 +271,10 @@ bool FireGas_DB(size_t len)
 
 bool FireGas_Mul(size_t len)
 {
+    if (!g_calculate_gas) {
+        return true;
+    }
+
     const int MAX = INT_MAX / (1 * GAS_PRECISION);
     if (len < MAX) {
         len = len * 1 * GAS_PRECISION;

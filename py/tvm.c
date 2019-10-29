@@ -55,6 +55,8 @@ void nlr_jump_fail(void *val) {
 }
 
 void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *result) {
+    g_calculate_gas = false;
+
     mp_obj_exception_t* o = exception;
     const char * exception_name = qstr_str(o->base.type->name);
     int error_code = 1001;
@@ -64,7 +66,6 @@ void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *resul
         error_code = 1003;
     }
 
-    g_calculate_gas = false;
     vstr_t vstr;
     mp_print_t print;
     vstr_init_print(&vstr, 8, &print);
