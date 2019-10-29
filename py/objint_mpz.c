@@ -203,8 +203,11 @@ mp_obj_t mp_obj_int_binary_op(mp_binary_op_t op, mp_obj_t lhs_in, mp_obj_t rhs_i
         mp_float_t frhs = mpz_as_float(zrhs);
         return mp_obj_new_float(flhs / frhs);
     } else
+#elif ZVM_EXTMOD
+    if (op == MP_BINARY_OP_TRUE_DIVIDE || op == MP_BINARY_OP_INPLACE_TRUE_DIVIDE) {
+        mp_raise_TypeError("unsupported types for decimal");
+    } else
 #endif
-
     if (op >= MP_BINARY_OP_INPLACE_OR && op < MP_BINARY_OP_CONTAINS) {
         mp_obj_int_t *res = mp_obj_int_new_mpz();
 
@@ -283,14 +286,7 @@ mp_obj_t mp_obj_int_binary_op(mp_binary_op_t op, mp_obj_t lhs_in, mp_obj_t rhs_i
                 }
                 mpz_pow_inpl(&res->mpz, zlhs, zrhs);
                 break;
-
             default: {
-                #if ZVM_EXTMOD
-                mp_raise_TypeError("unsupported types for decimal");
-                #else
-                assert(op == MP_BINARY_OP_DIVMOD);
-                #endif
-
                 if (mpz_is_zero(zrhs)) {
                     goto zero_division_error;
                 }
