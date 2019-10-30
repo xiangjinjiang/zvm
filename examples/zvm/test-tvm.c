@@ -16,8 +16,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <assert.h>
+#include <time.h>
+#include <dirent.h>
 
 #include "py/tvm.h"
 
@@ -27,9 +28,8 @@ void test_execute() {
     for (int i = 0; i < 1; i++) {
         tvm_set_gas(1000000000);
 
-        const char *str = "class A:\n"
+        const char *str = "class A():\n"
                           "\n"
-                          "    @register.public(int)\n"
                           "    def test(self,a):\n"
                           "        return \"hello\"\n"
                           "    def test1(self,a):\n"
@@ -38,8 +38,12 @@ void test_execute() {
                           "        return True\n"
                           "\n";
 
-
         tvm_execute_result_t result;
+        tvm_init_result(&result);
+        tvm_execute(str, "A", PARSE_KIND_FILE, &result);
+        tvm_print_result(&result);
+        tvm_deinit_result(&result);
+
         tvm_init_result(&result);
         // 返回值 str
         tvm_execute("A().test(1)", "A", PARSE_KIND_EVAL, &result);
@@ -837,7 +841,63 @@ void test_recursive() {
     tvm_deinit_result(&result);
 }
 
-int main() {
+void test_bench_assert(const char *file) {
+    printf("%s:", file);
+    FILE *fp = NULL;
+    fp = fopen(file,"r");
+    char buffer[1024 * 8] = {0};
+    size_t readCnt = fread(buffer,1,sizeof(buffer),fp);  /* 返回值为11 */
+//    printf("readCnt = %ld\n%s\n",readCnt, buffer);
+
+    clock_t start_time = clock();
+    tvm_set_gas(100000000);
+    tvm_start();
+    tvm_set_gas(500000);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(buffer, file, PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    clock_t end_time = clock();
+//    printf("\nSpend time was: %f\n", ((double)end_time - start_time)/CLOCKS_PER_SEC);
+    if (result.result_type != RETURN_TYPE_EXCEPTION || result.error_code != 1002) {
+        printf(" fail");
+    }
+    double span = ((double)end_time - start_time)/CLOCKS_PER_SEC;
+    if (span > 0.05) {
+        printf(" fail");
+    }
+    printf("\n");
+    tvm_deinit_result(&result);
+}
+
+void test_bench() {
+    DIR *folder;
+    struct dirent *entry;
+//    int files = 0;
+
+    folder = opendir("./bench");
+    if(folder == NULL)
+    {
+        perror("Unable to read directory");
+        assert(false);
+    }
+
+    while( (entry=readdir(folder)) )
+    {
+        if (strcmp(entry->d_name, ".") == 0 ||
+            strcmp(entry->d_name, "..") == 0 )
+            continue;
+//        files++;
+        char file_path[100] = {0};
+        sprintf(file_path, "./bench/%s", entry->d_name);
+        test_bench_assert(file_path);
+    }
+
+    closedir(folder);
+}
+
+int main(int argc,char *argv[]) {
 
 //    test_execute();
 
@@ -888,7 +948,12 @@ int main() {
 
 //    test_complex();
 
-    test_recursive();
+//    test_recursive();
+
+
+
+//    test_bench();
+    test_bench_assert("./testcase/divmod.py");
 
     printf("finished\n");
 }
