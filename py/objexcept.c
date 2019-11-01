@@ -358,7 +358,6 @@ mp_obj_t mp_obj_new_exception_msg(const mp_obj_type_t *exc_type, const char *msg
     // Check that the given type is an exception type
     assert(exc_type->make_new == mp_obj_exception_make_new);
 
-    g_calculate_gas = false;
     // Try to allocate memory for the message
     mp_obj_str_t *o_str = m_new_obj_maybe(mp_obj_str_t);
 
@@ -385,7 +384,6 @@ mp_obj_t mp_obj_new_exception_msg(const mp_obj_type_t *exc_type, const char *msg
     o_str->hash = qstr_compute_hash(o_str->data, o_str->len);
     mp_obj_t arg = MP_OBJ_FROM_PTR(o_str);
     mp_obj_t result = mp_obj_exception_make_new(exc_type, 1, 0, &arg);
-    g_calculate_gas = true;
     return result;
 }
 
