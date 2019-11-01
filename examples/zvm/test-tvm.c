@@ -869,6 +869,7 @@ void test_bench_assert(const char *file) {
     }
     printf("\n");
     tvm_deinit_result(&result);
+    fclose(fp);
 }
 
 void test_bench() {
@@ -885,8 +886,10 @@ void test_bench() {
 
     while( (entry=readdir(folder)) )
     {
+        size_t name_len = strlen(entry->d_name);
         if (strcmp(entry->d_name, ".") == 0 ||
-            strcmp(entry->d_name, "..") == 0 )
+            strcmp(entry->d_name, "..") == 0 ||
+            !strcmp(entry->d_name + name_len - 4, ".py"))
             continue;
 //        files++;
         char file_path[100] = {0};
@@ -950,10 +953,10 @@ int main(int argc,char *argv[]) {
 
 //    test_recursive();
 
+    test_bench();
 
-
-//    test_bench();
-    test_bench_assert("./testcase/divmod.py");
+//    test_bench_assert("./testcase/gas_exception.py");
+//    tvm_gas_report();
 
     printf("finished\n");
 }
