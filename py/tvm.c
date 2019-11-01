@@ -55,6 +55,8 @@ void nlr_jump_fail(void *val) {
 }
 
 void caught_exception(mp_obj_exception_t* exception, tvm_execute_result_t *result) {
+
+    mp_stack_ctrl_init();
     g_calculate_gas = false;
 
     mp_obj_exception_t* o = exception;
@@ -100,8 +102,8 @@ static char heap[1024 * 1024 * 16];
 void tvm_start() {
 	// Initialized stack limit
     mp_stack_ctrl_init();
-	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
-//    mp_stack_set_limit(8192);
+//	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
+    mp_stack_set_limit(8192);
 	// Initialize heap
 	gc_init(heap, heap + sizeof(heap));
 	// Initialize interpreter
