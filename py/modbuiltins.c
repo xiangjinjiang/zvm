@@ -1111,17 +1111,14 @@ STATIC mp_obj_t builtin_event_emit(size_t n_args, const mp_obj_t *args, mp_map_t
     vstr_init_print(&vstr, 8, &print);
     mp_obj_print_helper(&print, dict_out, PRINT_JSON);
 
-    char *params_json = malloc(vstr.len + 1);
-    memset(params_json, '\0', vstr.len+1);
-    memcpy(params_json, vstr.buf, vstr.len);
-    size_t params_json_len = vstr_len(&vstr);
+    const char *params_json = vstr.buf;
+    size_t params_json_len = vstr.len;
     mp_obj_event_t* self = MP_OBJ_TO_PTR(args[0]);
     size_t name_len = strlen(self->topic);
     if (!FireGas_DB(name_len + params_json_len)) {
         return mp_const_none;
     }
-    event_call_fn(self->topic, params_json);
-    free(params_json);
+    event_call_fn(self->topic, params_json, params_json_len);
     vstr_clear(&vstr);
     return mp_const_none;
 }
