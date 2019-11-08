@@ -463,7 +463,8 @@ void tvm_export_abi(char ** params_json) {
     mp_print_t print;
     vstr_init_print(&vstr, 8, &print);
     mp_obj_print_helper(&print, abi, PRINT_JSON);
-    *params_json = malloc(vstr.len);
+    *params_json = malloc(vstr.len+1);
+    memset(*params_json, '\0', vstr.len+1);
     memcpy(*params_json, vstr.buf, vstr.len);
     vstr_clear(&vstr);
 }
