@@ -1740,4 +1740,29 @@ size_t mpz_as_str_inpl(const mpz_t *i, unsigned int base, const char *prefix, ch
     return s - str;
 }
 
+size_t mpz_as_int_bytes_len(const mpz_t *i) {
+
+    size_t rtv = 0;
+
+    if (i->len == 0) {
+        return rtv;
+    }
+
+    rtv = i->len * DIG_SIZE;
+    mpz_dig_t *d = i->dig + i->len;
+    bool done = false;
+    while (d-- > i->dig && !done) {
+        for (int bits = DIG_SIZE - 1; bits >= 0; bits--) {
+            if (*d >> bits == 0) {
+                rtv--;
+            } else {
+                done = true;
+                break;
+            }
+        }
+    }
+
+    return rtv;
+}
+
 #endif // MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_MPZ

@@ -96,14 +96,18 @@ void execute_from_str(const char *str, const char *file_name, uint emit_opt, tvm
     }
 }
 
+static mp_obj_t pystack[1024];
+
 // 0.03814697265625	per memory byte
 // 500000gas / 0.04 = 11.9mb
 static char heap[1024 * 1024 * 16];
+
 void tvm_start() {
 	// Initialized stack limit
-    mp_stack_ctrl_init();
-//	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
-    mp_stack_set_limit(8192);
+    mp_pystack_init(pystack, &pystack[MP_ARRAY_SIZE(pystack)]);
+//    mp_stack_ctrl_init();
+////	mp_stack_set_limit(40000 * (BYTES_PER_WORD / 4));
+//    mp_stack_set_limit(8192);
 	// Initialize heap
 	gc_init(heap, heap + sizeof(heap));
 	// Initialize interpreter

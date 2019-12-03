@@ -699,6 +699,11 @@ void mp_obj_storage_value(const mp_obj_t value, byte** storage_value, size_t *st
             mp_obj_t len = mp_obj_len(bin);
             mp_int_t len_in = MP_OBJ_SMALL_INT_VALUE(len);
             len_in = ((len_in - 2) / 8 + 1) + 1;
+//TODO:
+//            mp_obj_int_t *t = MP_OBJ_TO_PTR(value);
+//            size_t len_in = mpz_as_int_bytes_len(&t->mpz);
+//            len_in = (len_in / 8 + 1) + 1;
+
             byte *buf = malloc(len_in);
             memset(buf, 0, len_in);
             memset(buf, INT_FORMAT_C, 1);
