@@ -284,7 +284,19 @@ STATIC mp_obj_t fun_bc_call(mp_obj_t self_in, size_t n_args, size_t n_kw, const 
     // allocate state for locals and stack
     mp_code_state_t *code_state = NULL;
     #if MICROPY_ENABLE_PYSTACK
-    code_state = mp_pystack_alloc(sizeof(mp_code_state_t) + state_size);
+    //TODO:
+    if (state_size > VM_MAX_STATE_ON_STACK) {
+        code_state = m_new_obj_var_maybe(mp_code_state_t, byte, state_size);
+        #if MICROPY_DEBUG_VM_STACK_OVERFLOW
+        if (code_state != NULL) {
+            memset(code_state->state, 0, state_size);
+        }
+        #endif
+    }
+    if (code_state == NULL) {
+        code_state = mp_pystack_alloc(sizeof(mp_code_state_t) + state_size);
+        state_size = 0; // indicate that we allocated using alloca
+    }
     #else
     if (state_size > VM_MAX_STATE_ON_STACK) {
         code_state = m_new_obj_var_maybe(mp_code_state_t, byte, state_size);
@@ -351,7 +363,12 @@ STATIC mp_obj_t fun_bc_call(mp_obj_t self_in, size_t n_args, size_t n_kw, const 
     }
 
     #if MICROPY_ENABLE_PYSTACK
-    mp_pystack_free(code_state);
+    //TODO:
+    if (state_size != 0) {
+        m_del_var(mp_code_state_t, byte, state_size, code_state);
+    } else {
+        mp_pystack_free(code_state);
+    }
     #else
     // free the state if it was allocated on the heap
     if (state_size != 0) {

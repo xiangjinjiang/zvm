@@ -948,6 +948,74 @@ void test_bench() {
     closedir(folder);
 }
 
+void test_stack_check() {
+    storage_get_data_fn = storage_get_data;
+    storage_set_data_fn = storage_set_data;
+    storage_remove_data_fn = storage_remove_data;
+
+//    for (int i = 0; i < 10000; i++) {
+    tvm_start();
+    tvm_set_gas(500000);
+
+    const char *str =
+            "import account\n"
+            "import ujson\n"
+            "\n"
+            "class Distribution(object):\n"
+            "    def __init__(self):\n"
+            "        self.distribution_lists = zdict()\n"
+            "        self.admin = msg.sender\n"
+            "        self.total_percentage_dict = zdict()\n"
+            "\n"
+            "    @register.public(str, dict)\n"
+            "    def init_distribution_list(self, group, distribution_list):\n"
+            "#        if msg.sender != self.admin:\n"
+            "#            return\n"
+            "        self.distribution_lists = '''{\"zvede238caaaaca16c1473bb66fcd605cb9c3c88992c7d1053130e2de65fa5fd7a\": 100, \"zvede238caaaaca16c1473bb66fcd605cb9c3c88992c7d1053130e2de65fa5fd7b\": 100}'''\n"
+            "        #ujson.dumps(distribution_list)\n"
+            "        total_percentage_dict = 0\n"
+            "        for k in distribution_list:\n"
+            "            if type(distribution_list[k]) != int:\n"
+            "                return\n"
+            "            total_percentage_dict += distribution_list[k]\n"
+            "        self.total_percentage_dict = total_percentage_dict\n"
+            "\n"
+            "    @register.public(str)\n"
+            "    def deposit(self, group):\n"
+            "        if msg.value == 0:\n"
+            "            return\n"
+            "        if group not in self.distribution_lists:\n"
+            "            return\n"
+            "        all_user = ujson.loads(self.distribution_lists[group])\n"
+            "        total = self.total_percentage_dict[group]\n"
+            "        for user in all_user:\n"
+            "            can_withdraw = msg.value * all_user[user] // total\n"
+            "            account.transfer(user, can_withdraw)\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+
+    tvm_execute(str, "test_recursive", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Distribution", "__init__", "[0]", &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Distribution", "init_distribution_list", "[\"1\", {\"zvede238caaaaca16c1473bb66fcd605cb9c3c88992c7d1053130e2de65fa5fd7a\": 100, \"zvede238caaaaca16c1473bb66fcd605cb9c3c88992c7d1053130e2de65fa5fd7b\": 100}]", &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_gas_report();
+//    }
+}
+
 int main(int argc,char *argv[]) {
 
 //    test_execute();
