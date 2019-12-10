@@ -118,6 +118,17 @@ static inline void mp_nonlocal_free(void *ptr, size_t n_bytes) {
     mp_pystack_free(ptr);
 }
 
+static inline void *mp_nonlocal_alloc_t(size_t n_bytes) {
+    return m_new(uint8_t, n_bytes);
+}
+
+static inline void *mp_nonlocal_realloc_t(void *ptr, size_t old_n_bytes, size_t new_n_bytes) {
+    return m_renew(uint8_t, ptr, old_n_bytes, new_n_bytes);
+}
+
+static inline void mp_nonlocal_free_t(void *ptr, size_t n_bytes) {
+    m_del(uint8_t, ptr, n_bytes);
+}
 #endif
 
 #endif // MICROPY_INCLUDED_PY_PYSTACK_H

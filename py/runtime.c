@@ -679,7 +679,7 @@ void mp_call_prepare_args_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_
 
         // allocate memory for the new array of args
         args2_alloc = 1 + n_args + 2 * (n_kw + kw_dict_len);
-        args2 = mp_nonlocal_alloc(args2_alloc * sizeof(mp_obj_t));
+        args2 = mp_nonlocal_alloc_t(args2_alloc * sizeof(mp_obj_t));
 
         // copy the self
         if (self != MP_OBJ_NULL) {
@@ -700,7 +700,7 @@ void mp_call_prepare_args_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_
 
         // allocate memory for the new array of args
         args2_alloc = 1 + n_args + len + 2 * (n_kw + kw_dict_len);
-        args2 = mp_nonlocal_alloc(args2_alloc * sizeof(mp_obj_t));
+        args2 = mp_nonlocal_alloc_t(args2_alloc * sizeof(mp_obj_t));
 
         // copy the self
         if (self != MP_OBJ_NULL) {
@@ -716,7 +716,7 @@ void mp_call_prepare_args_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_
 
         // allocate memory for the new array of args
         args2_alloc = 1 + n_args + 2 * (n_kw + kw_dict_len) + 3;
-        args2 = mp_nonlocal_alloc(args2_alloc * sizeof(mp_obj_t));
+        args2 = mp_nonlocal_alloc_t(args2_alloc * sizeof(mp_obj_t));
 
         // copy the self
         if (self != MP_OBJ_NULL) {
@@ -733,7 +733,7 @@ void mp_call_prepare_args_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_
         mp_obj_t item;
         while ((item = mp_iternext(iterable)) != MP_OBJ_STOP_ITERATION) {
             if (args2_len >= args2_alloc) {
-                args2 = mp_nonlocal_realloc(args2, args2_alloc * sizeof(mp_obj_t), args2_alloc * 2 * sizeof(mp_obj_t));
+                args2 = mp_nonlocal_realloc_t(args2, args2_alloc * sizeof(mp_obj_t), args2_alloc * 2 * sizeof(mp_obj_t));
                 args2_alloc *= 2;
             }
             args2[args2_len++] = item;
@@ -784,7 +784,7 @@ void mp_call_prepare_args_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_
                 if (new_alloc < 4) {
                     new_alloc = 4;
                 }
-                args2 = mp_nonlocal_realloc(args2, args2_alloc * sizeof(mp_obj_t), new_alloc * sizeof(mp_obj_t));
+                args2 = mp_nonlocal_realloc_t(args2, args2_alloc * sizeof(mp_obj_t), new_alloc * sizeof(mp_obj_t));
                 args2_alloc = new_alloc;
             }
 
@@ -816,7 +816,7 @@ mp_obj_t mp_call_method_n_kw_var(bool have_self, size_t n_args_n_kw, const mp_ob
     mp_call_prepare_args_n_kw_var(have_self, n_args_n_kw, args, &out_args);
 
     mp_obj_t res = mp_call_function_n_kw(out_args.fun, out_args.n_args, out_args.n_kw, out_args.args);
-    mp_nonlocal_free(out_args.args, out_args.n_alloc * sizeof(mp_obj_t));
+    mp_nonlocal_free_t(out_args.args, out_args.n_alloc * sizeof(mp_obj_t));
 
     return res;
 }
