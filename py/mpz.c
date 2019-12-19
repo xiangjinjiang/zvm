@@ -1740,7 +1740,7 @@ size_t mpz_as_str_inpl(const mpz_t *i, unsigned int base, const char *prefix, ch
     return s - str;
 }
 
-size_t mpz_as_int_bytes_len(const mpz_t *i) {
+size_t mpz_as_int_bits_len(const mpz_t *i) {
 
     size_t rtv = 0;
 
