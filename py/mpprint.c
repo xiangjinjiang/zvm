@@ -530,7 +530,9 @@ int mp_vprintf(const mp_print_t *print, const char *fmt, va_list args) {
             case 'p':
             case 'P': // don't bother to handle upcase for 'P'
                 // Use unsigned long int to work on both ILP32 and LP64 systems
+#if !ZVM_EXTMOD
                 chrs += mp_print_int(print, va_arg(args, unsigned long int), 0, 16, 'a', flags, fill, width);
+#endif
                 break;
 #if MICROPY_PY_BUILTINS_FLOAT
             case 'e':
