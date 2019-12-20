@@ -1016,6 +1016,37 @@ void test_stack_check() {
 //    }
 }
 
+void test_p() {
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str = "class B():\n"
+                      "    def __init__(self):\n"
+                      "        class A():\n"
+                      "            pass\n"
+                      "        a = A()\n"
+//                      "        print(hex(id(a)))\n"
+                      "        print(a)\n"
+                      "        print(str(a))\n"
+                      "        b = str(a)\n"
+                      "        print(repr(a))\n"
+                      "        print(b)\n"
+                      "        print(self.__init__)\n";
+
+    tvm_set_register();
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+    tvm_execute(str, "test_p", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("B", "__init__", "[]", &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+}
+
 int main(int argc,char *argv[]) {
 
 //    test_execute();
@@ -1067,12 +1098,14 @@ int main(int argc,char *argv[]) {
 
 //    test_complex();
 
-    test_recursive();
+//    test_recursive();
 
 //    test_bench();
 
 //    test_bench_assert("./testcase/gas_exception.py");
 //    tvm_gas_report();
+
+    test_p();
 
     printf("finished\n");
 }
