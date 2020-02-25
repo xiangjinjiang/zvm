@@ -751,6 +751,42 @@ void test_bigint() {
     tvm_gas_report();
 }
 
+void test_ZIP003() {
+    storage_get_data_fn = storage_get_data;
+    storage_set_data_fn = storage_set_data;
+    storage_remove_data_fn = storage_remove_data;
+
+    ZIP003 = true;
+
+    tvm_start();
+    tvm_set_gas(10000000);
+
+    const char *str =
+            "class Token():\n"
+            "\n"
+            "    def __init__(self):\n"
+            "        self.a = 10000000000000 * 1000000000000000000\n"
+            "\n"
+            "\n";
+
+    tvm_set_register();
+    tvm_set_msg("zvxxx", 500);
+
+    tvm_execute_result_t result;
+    tvm_init_result(&result);
+
+    tvm_execute(str, "test_ZIP003", PARSE_KIND_FILE, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_init_result(&result);
+    tvm_fun_call("Token", "__init__", NULL, &result);
+    tvm_print_result(&result);
+    tvm_deinit_result(&result);
+
+    tvm_gas_report();
+}
+
 void test_exectime() {
 
     tvm_set_gas(100000000);
@@ -1105,7 +1141,9 @@ int main(int argc,char *argv[]) {
 //    test_bench_assert("./testcase/gas_exception.py");
 //    tvm_gas_report();
 
-    test_p();
+//    test_p();
+
+    test_ZIP003();
 
     printf("finished\n");
 }

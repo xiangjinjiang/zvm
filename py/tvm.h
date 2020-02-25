@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 extern _Bool ZIP002;
+extern _Bool ZIP003;
 
 typedef enum {
     RETURN_TYPE_INT = 1,
