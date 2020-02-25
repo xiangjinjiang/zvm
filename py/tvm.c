@@ -36,7 +36,6 @@
 #include "py/bc0.h"
 
 _Bool ZIP002 = false;
-_Bool ZIP003 = false;
 
 uint mp_import_stat(const char *path) {
     struct stat st;
